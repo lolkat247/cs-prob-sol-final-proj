@@ -15,3 +15,25 @@ def plot_sine_wave(x, y, title="Sine Wave"):
     plt.show()
 
 def neew func
+divmodd
+divmod
+divmodd
+divmodd
+divmoddd
+divmodd
+divmodd
+divmodd
+di
+d
+divmodd
+divmodd
+divmodd
+i do tajflaksjdf
+adjf;lajdlsfk
+fjalksdfj;alkdjf
+adjfalksjdf;alldfa;lkdjf;alkjdf
+a;dfkjalkjf
+aj;lfj;alj
+ajdfkja;lksdjf
+jasdkfj;akjf
+a
