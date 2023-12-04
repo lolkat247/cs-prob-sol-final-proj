@@ -13,3 +13,5 @@ def plot_sine_wave(x, y, title="Sine Wave"):
     plt.title(title)
     plt.plot(x, y)
     plt.show()
+
+def neew func
