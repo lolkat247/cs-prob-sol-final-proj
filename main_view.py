@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import ttk
 from tkinter import messagebox
 
 class MainView:
@@ -7,76 +7,41 @@ class MainView:
         self.controller = controller
         self.root = tk.Tk()
         self.root.title("SPIDAM - Acoustic Modeling")
+        self.root.minsize(600, 400)
         self.create_widgets()
 
     def create_widgets(self):
         # frame top
-        self.top_ribbon_frame = tk.Frame(
-            self.root, 
-            width=self.root.winfo_width(), 
-            height=self.root.winfo_height() * ( 1 / 8 )
-        )
-        self.top_ribbon_frame.pack()
+        self.top_ribbon_frame = tk.Frame(self.root)
+        self.top_ribbon_frame.pack(fill=tk.X)
 
-        ## frame load button
-        self.load_frame = tk.Frame(self.top_ribbon_frame)
-        self.load_frame.pack(pady=10)
-
-        ## load Button
-        self.load_button = tk.Button(self.load_frame, padx=10, text="Load Audio File", command=self.controller.load_audio_file)
+        # load Button
+        self.load_button = tk.Button(self.top_ribbon_frame, text="Load Audio File", command=self.controller.load_audio_file)
         self.load_button.pack(side=tk.LEFT)
 
+        # label for displaying audio file name
+        self.file_label = tk.Label(self.top_ribbon_frame, text="No file loaded")
+        self.file_label.pack(side=tk.LEFT)
+
         # frame middle 
-        self.middle_frame = tk.Frame(
-            self.root, 
-            width=self.root.winfo_width(), 
-            height=self.root.winfo_height() - self.top_ribbon_frame.winfo_height()
-        )
-        self.middle_frame.pack()
+        self.middle_frame = tk.Frame(self.root)
+        self.middle_frame.pack(fill=tk.BOTH, expand=True)
 
-        ## frame middle left
-        self.info_frame = tk.Frame(
-            self.middle_frame, 
-            width=self.root.winfo_width() * (1 / 5), 
-            height=self.middle_frame.winfo_height()
-        )
-        self.info_frame.pack()
+        # tabbed plots
+        self.tab_control = ttk.Notebook(self.middle_frame)
+        self.tab1 = ttk.Frame(self.tab_control)
+        self.tab2 = ttk.Frame(self.tab_control)
+        self.tab3 = ttk.Frame(self.tab_control)
+        self.tab_control.add(self.tab1, text='RT60 Low')
+        self.tab_control.add(self.tab2, text='RT60 Mid')
+        self.tab_control.add(self.tab3, text='RT60 High')
+        self.tab_control.pack(fill=tk.BOTH, expand=True)
 
-        ### info label
-        self.plot_label = tk.Label(
-            self.info_frame, 
-            text="Audio Information:", 
-            bg="gray", 
-            width=self.info_frame.winfo_width()
-        )
-        self.plot_label.pack(side=tk.LEFT, padx=10)
-
-        ## frame middle right (main content)
-        self.info_frame = tk.Frame(
-            self.middle_frame, 
-            width=self.middle_frame.winfo_width() - self.info_frame.winfo_width(), 
-            height=self.middle_frame.winfo_height()
-        )
-        self.info_frame.pack()
-
-        
-
-        # # Text Output
-        # self.text_output = tk.Text(self.analysis_frame, height=10, width=50)
-        # self.text_output.pack(side=tk.LEFT, padx=10)
-
-        # # Placeholder for plots (to be replaced with actual plot widgets)
-        # self.plot_label = tk.Label(self.plot_frame, text="Plots will be displayed here", bg="gray", width=50, height=10)
-        # self.plot_label.pack(side=tk.LEFT, padx=10)
-
-        # # Buttons for additional actions (e.g., cleaning data, analyzing, etc.)
-        # self.clean_button = tk.Button(self.action_frame, text="Clean Data", command=self.controller.clean_audio_data)
-        # self.clean_button.pack(side=tk.LEFT, padx=5)
+        # button to combine plots
+        self.combine_button = tk.Button(self.middle_frame, text="Combine Plots", command=self.controller.combine_plots)
+        self.combine_button.pack(side=tk.BOTTOM)
 
     def run(self):
         self.root.mainloop()
 
     # Additional methods for updating the view, e.g., display results
-
-    def run(self):
-        self.root.mainloop()
