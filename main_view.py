@@ -2,9 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import matplotlib.pyplot as plt
 from matplotlib.patches import Circle, Arc
-
 
 class MainView:
     def __init__(self, controller):
@@ -55,9 +53,6 @@ class MainView:
         self.waveform_canvas = FigureCanvasTkAgg(self.waveform_fig, master=self.waveform_frame)
         self.waveform_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-        # Draw the initial smiley face
-        self.draw_smiley_face()
-
         # tabbed plots
         self.tab_control = ttk.Notebook(self.right_frame)
         self.tab1 = ttk.Frame(self.tab_control)
@@ -68,30 +63,39 @@ class MainView:
         self.tab_control.add(self.tab3, text='RT60 High')
         self.tab_control.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-        # Create figures and axes for each tab
-        self.fig1, self.ax1 = plt.subplots()
-        self.fig2, self.ax2 = plt.subplots()
-        self.fig3, self.ax3 = plt.subplots()
-
-        # Draw smiley faces on each tab
-        self.draw_smiley_on_tab(self.fig1, self.ax1)
-        self.draw_smiley_on_tab(self.fig2, self.ax2)
-        self.draw_smiley_on_tab(self.fig3, self.ax3)
-
         # Embed the figures in the tabs
-        self.canvas1 = FigureCanvasTkAgg(self.fig1, master=self.tab1)
+        self.canvas1 = FigureCanvasTkAgg(Figure(figsize=(5, 2), dpi=100), master=self.tab1)
         self.canvas1.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-        self.canvas2 = FigureCanvasTkAgg(self.fig2, master=self.tab2)
+        self.canvas2 = FigureCanvasTkAgg(Figure(figsize=(5, 2), dpi=100), master=self.tab2)
         self.canvas2.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-        self.canvas3 = FigureCanvasTkAgg(self.fig3, master=self.tab3)
+        self.canvas3 = FigureCanvasTkAgg(Figure(figsize=(5, 2), dpi=100), master=self.tab3)
         self.canvas3.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+    def set_file_label(self, text):
+        self.file_label.config(text=text)
+
+    def set_duration_label(self, duration):
+        self.duration_label.config(text=f"Duration:\n{duration:.2f} seconds")
+
+    def set_frequency_label(self, frequency):
+        if frequency: self.frequency_label.config(text=f"Peak Resonant Frequency:\n{frequency:.2f} Hz")
+
+    def update_waveform(self, times, data):
+        self.waveform_ax.clear()
+        self.waveform_ax.plot(times, data)
+        self.waveform_ax.set_title('Audio Waveform', fontsize=14, fontweight='bold')
+        self.waveform_ax.set_xlabel('Time (s)', fontsize=12)
+        self.waveform_ax.set_ylabel('Amplitude', fontsize=12)
+        self.waveform_ax.grid(True)
+        self.waveform_fig.tight_layout()
+        self.waveform_canvas.draw()
 
     def draw_smiley_face(self):
         # Clear the current plot
         self.waveform_ax.clear()
 
         # Set the title
-        self.waveform_ax.set_title('Audio Waveform', fontsize=14, fontweight='bold')
+        self.waveform_ax.set_title('Smiley Face', fontsize=14, fontweight='bold')
 
         # Draw a smiley face
         face = Circle((0.5, 0.5), 0.4, color='yellow', fill=True)
@@ -110,7 +114,7 @@ class MainView:
         # Refresh the canvas
         self.waveform_canvas.draw()
 
-    def draw_smiley_on_tab(self, fig, ax):
+    def draw_smiley_on_tab(self, canvas, ax):
         # Clear the current plot
         ax.clear()
 
@@ -129,7 +133,7 @@ class MainView:
         ax.axis('off')
 
         # Refresh the canvas
-        fig.canvas.draw()
+        canvas.draw()
 
     def run(self):
         self.root.mainloop()
