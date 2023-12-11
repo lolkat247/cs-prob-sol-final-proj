@@ -1,82 +1,167 @@
 import tkinter as tk
-from tkinter import filedialog
-from tkinter import messagebox
+from tkinter import ttk
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.patches import Circle, Arc
 
 class MainView:
     def __init__(self, controller):
         self.controller = controller
         self.root = tk.Tk()
         self.root.title("SPIDAM - Acoustic Modeling")
+        self.root.minsize(600, 400)
         self.create_widgets()
 
     def create_widgets(self):
         # frame top
-        self.top_ribbon_frame = tk.Frame(
-            self.root, 
-            width=self.root.winfo_width(), 
-            height=self.root.winfo_height() * ( 1 / 8 )
-        )
-        self.top_ribbon_frame.pack()
+        self.top_ribbon_frame = tk.Frame(self.root)
+        self.top_ribbon_frame.pack(fill=tk.X)
 
-        ## frame load button
-        self.load_frame = tk.Frame(self.top_ribbon_frame)
-        self.load_frame.pack(pady=10)
-
-        ## load Button
-        self.load_button = tk.Button(self.load_frame, padx=10, text="Load Audio File", command=self.controller.load_audio_file)
+        # load Button
+        self.load_button = tk.Button(self.top_ribbon_frame, text="Load Audio File", command=self.controller.load_audio_file)
         self.load_button.pack(side=tk.LEFT)
 
+        # label for displaying audio file name
+        self.file_label = tk.Label(self.top_ribbon_frame, text="No file loaded")
+        self.file_label.pack(side=tk.LEFT)
+
         # frame middle 
-        self.middle_frame = tk.Frame(
-            self.root, 
-            width=self.root.winfo_width(), 
-            height=self.root.winfo_height() - self.top_ribbon_frame.winfo_height()
-        )
-        self.middle_frame.pack()
+        self.middle_frame = tk.Frame(self.root)
+        self.middle_frame.pack(fill=tk.BOTH, expand=True)
 
-        ## frame middle left
-        self.info_frame = tk.Frame(
-            self.middle_frame, 
-            width=self.root.winfo_width() * (1 / 5), 
-            height=self.middle_frame.winfo_height()
-        )
-        self.info_frame.pack()
+        # info section
+        self.info_frame = tk.Frame(self.middle_frame, width=200)
+        self.info_frame.pack(side=tk.LEFT, fill=tk.Y)
 
-        ### info label
-        self.plot_label = tk.Label(
-            self.info_frame, 
-            text="Audio Information:", 
-            bg="gray", 
-            width=self.info_frame.winfo_width()
-        )
-        self.plot_label.pack(side=tk.LEFT, padx=10)
+        # label for displaying audio file duration
+        self.duration_label = tk.Label(self.info_frame, text="Duration:\nN/A", justify=tk.LEFT)
+        self.duration_label.pack(anchor='w')
 
-        ## frame middle right (main content)
-        self.info_frame = tk.Frame(
-            self.middle_frame, 
-            width=self.middle_frame.winfo_width() - self.info_frame.winfo_width(), 
-            height=self.middle_frame.winfo_height()
-        )
-        self.info_frame.pack()
+        # label for displaying peak resonant frequency
+        self.frequency_label = tk.Label(self.info_frame, text="Peak Resonant Frequency:\nN/A", justify=tk.LEFT)
+        self.frequency_label.pack(anchor='w')
 
-        
+        # right side frame
+        self.right_frame = tk.Frame(self.middle_frame)
+        self.right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
-        # # Text Output
-        # self.text_output = tk.Text(self.analysis_frame, height=10, width=50)
-        # self.text_output.pack(side=tk.LEFT, padx=10)
+        # waveform plot
+        self.waveform_frame = tk.Frame(self.right_frame)
+        self.waveform_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=False)
+        self.waveform_fig = Figure(figsize=(5, 2), dpi=100)
+        self.waveform_ax = self.waveform_fig.add_subplot(111)
+        self.waveform_canvas = FigureCanvasTkAgg(self.waveform_fig, master=self.waveform_frame)
+        self.waveform_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-        # # Placeholder for plots (to be replaced with actual plot widgets)
-        # self.plot_label = tk.Label(self.plot_frame, text="Plots will be displayed here", bg="gray", width=50, height=10)
-        # self.plot_label.pack(side=tk.LEFT, padx=10)
+        # tabbed plots
+        self.tab_control = ttk.Notebook(self.right_frame)
+        self.tab1 = ttk.Frame(self.tab_control)
+        self.tab2 = ttk.Frame(self.tab_control)
+        self.tab3 = ttk.Frame(self.tab_control)
+        self.tab_control.add(self.tab1, text='RT60 Low')
+        self.tab_control.add(self.tab2, text='RT60 Mid')
+        self.tab_control.add(self.tab3, text='RT60 High')
+        self.tab_control.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-        # # Buttons for additional actions (e.g., cleaning data, analyzing, etc.)
-        # self.clean_button = tk.Button(self.action_frame, text="Clean Data", command=self.controller.clean_audio_data)
-        # self.clean_button.pack(side=tk.LEFT, padx=5)
+        # Embed the figures in the tabs
+        self.canvas1 = FigureCanvasTkAgg(Figure(figsize=(5, 2), dpi=100), master=self.tab1)
+        self.canvas1.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        self.canvas2 = FigureCanvasTkAgg(Figure(figsize=(5, 2), dpi=100), master=self.tab2)
+        self.canvas2.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        self.canvas3 = FigureCanvasTkAgg(Figure(figsize=(5, 2), dpi=100), master=self.tab3)
+        self.canvas3.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-    def run(self):
-        self.root.mainloop()
+        # Button to calculate overall RT60
+        self.calc_overall_rt60_button = tk.Button(self.right_frame, text="Calculate Overall RT60", command=self.controller.calculate_and_display_overall_rt60)
+        self.calc_overall_rt60_button.pack(side=tk.TOP, pady=10)
 
-    # Additional methods for updating the view, e.g., display results
+        # Button to display spectrogram
+        self.show_spectrogram_button = tk.Button(self.right_frame, text="Show Spectrogram", command=self.show_spectrogram)
+        self.show_spectrogram_button.pack(side=tk.TOP, pady=0)
+
+    def set_file_label(self, text):
+        self.file_label.config(text=text)
+
+    def set_duration_label(self, duration):
+        self.duration_label.config(text=f"Duration:\n{duration:.2f} seconds")
+
+    def set_frequency_label(self, frequency):
+        if frequency:
+            self.frequency_label.config(text=f"Peak Resonant Frequency:\n{frequency:.2f} Hz")
+        else:
+            self.frequency_label.config(text="Peak Resonant Frequency:\nN/A")
+
+    def update_waveform(self, times, data):
+        self.waveform_ax.clear()
+        self.waveform_ax.plot(times, data)
+        self.waveform_ax.set_title('Audio Waveform', fontsize=14, fontweight='bold')
+        self.waveform_ax.set_xlabel('Time (s)', fontsize=12)
+        self.waveform_ax.set_ylabel('Amplitude', fontsize=12)
+        self.waveform_ax.grid(True)
+        self.waveform_fig.tight_layout()
+        self.waveform_canvas.draw()
+
+    def update_rt60_plot(self, canvas, rt60_value, title):
+        fig = canvas.figure
+        ax = fig.add_subplot(111)
+        ax.clear()
+        ax.bar([0], [rt60_value], width=0.5)
+        ax.set_title(title)
+        ax.set_ylabel('RT60 (s)')
+        ax.set_ylim(0, max(rt60_value * 1.2, 0.5))  # Ensure the plot has some space above the bar
+        ax.set_xticks([])
+        canvas.draw()
+
+    def display_overall_rt60_popup(self, overall_rt60, rt60_low, rt60_mid, rt60_high):
+        # Create a new top-level window
+        popup = tk.Toplevel(self.root)
+        popup.title("RT60 Values")
+
+        # Create a figure for the RT60 values
+        fig = Figure(figsize=(5, 3), dpi=100)
+        ax = fig.add_subplot(111)
+        categories = ['Low', 'Mid', 'High', 'Overall']
+        rt60_values = [rt60_low, rt60_mid, rt60_high, overall_rt60]
+        ax.bar(categories, rt60_values, color=['red', 'green', 'blue', 'cyan'])
+        ax.set_ylabel('RT60 (s)')
+        ax.set_ylim(0, max(rt60_values) * 1.2)  # Ensure the plot has some space above the bars
+
+        # Create a canvas and add the figure to the top-level window
+        canvas = FigureCanvasTkAgg(fig, master=popup)
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+        # Draw the canvas
+        canvas.draw()
+
+        # Run the popup window's event loop
+        popup.mainloop()
+
+    def show_spectrogram(self):
+        # Create a new top-level window
+        popup = tk.Toplevel(self.root)
+        popup.title("Spectrogram")
+
+        # Create a figure for the spectrogram
+        fig = Figure(figsize=(6, 4), dpi=100)
+        ax = fig.add_subplot(111)
+
+        # Compute the spectrogram
+        if self.controller.model.data is not None:
+            Pxx, freqs, bins, im = ax.specgram(self.controller.model.data, NFFT=1024, Fs=self.controller.model.sample_rate, noverlap=512)
+
+        ax.set_title('Spectrogram')
+        ax.set_xlabel('Time (s)')
+        ax.set_ylabel('Frequency (Hz)')
+
+        # Create a canvas and add the figure to the top-level window
+        canvas = FigureCanvasTkAgg(fig, master=popup)
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+        # Draw the canvas
+        canvas.draw()
+
+        # Run the popup window's event loop
+        popup.mainloop()
 
     def run(self):
         self.root.mainloop()
