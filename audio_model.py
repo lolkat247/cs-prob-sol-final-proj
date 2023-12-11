@@ -78,7 +78,6 @@ class AudioModel:
         energy_db = 20 * np.log10(amplitude_envelope)
 
         # Find the decay curve after the clap sound has stopped
-        # This is a simplified approach; in practice, you would need to detect the end of the clap
         decay_start_index = np.argmax(energy_db)
         decay_curve = energy_db[decay_start_index:]
 

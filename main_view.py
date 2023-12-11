@@ -71,9 +71,9 @@ class MainView:
         self.canvas3 = FigureCanvasTkAgg(Figure(figsize=(5, 2), dpi=100), master=self.tab3)
         self.canvas3.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-        # Button to calculate overall RT60 - This should be the only place where this button is created
+        # Button to calculate overall RT60
         self.calc_overall_rt60_button = tk.Button(self.right_frame, text="Calculate Overall RT60", command=self.controller.calculate_and_display_overall_rt60)
-        self.calc_overall_rt60_button.pack(side=tk.TOP, pady=10)  # Adjust padding as needed
+        self.calc_overall_rt60_button.pack(side=tk.TOP, pady=10)
 
         # Button to display spectrogram
         self.show_spectrogram_button = tk.Button(self.right_frame, text="Show Spectrogram", command=self.show_spectrogram)
