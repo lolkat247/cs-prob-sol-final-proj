@@ -47,8 +47,14 @@ class AudioController:
     def calculate_and_display_overall_rt60(self):
         # Calculate the overall RT60 value
         overall_rt60 = self.model.calculate_rt60()
-        # Display the overall RT60 in a popup window
-        self.view.display_overall_rt60_popup(overall_rt60)
+
+        # Retrieve the low, mid, and high RT60 values
+        rt60_low = self.model.calculate_rt60_for_frequency_range(20, 250)
+        rt60_mid = self.model.calculate_rt60_for_frequency_range(250, 2000)
+        rt60_high = self.model.calculate_rt60_for_frequency_range(2000, 20000)
+
+        # Display the RT60 values in a popup window
+        self.view.display_overall_rt60_popup(overall_rt60, rt60_low, rt60_mid, rt60_high)
 
     def run(self):
         self.view.run()

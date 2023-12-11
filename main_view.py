@@ -108,17 +108,19 @@ class MainView:
         ax.set_xticks([])
         canvas.draw()
 
-    def display_overall_rt60_popup(self, overall_rt60):
+    def display_overall_rt60_popup(self, overall_rt60, rt60_low, rt60_mid, rt60_high):
         # Create a new top-level window
         popup = tk.Toplevel(self.root)
-        popup.title("Overall RT60")
+        popup.title("RT60 Values")
 
-        # Create a figure for the RT60 value
+        # Create a figure for the RT60 values
         fig = Figure(figsize=(5, 3), dpi=100)
         ax = fig.add_subplot(111)
-        ax.bar(['Overall RT60'], [overall_rt60], color='blue')
+        categories = ['Low', 'Mid', 'High', 'Overall']
+        rt60_values = [rt60_low, rt60_mid, rt60_high, overall_rt60]
+        ax.bar(categories, rt60_values, color=['red', 'green', 'blue', 'cyan'])
         ax.set_ylabel('RT60 (s)')
-        ax.set_ylim(0, max(overall_rt60 * 1.2, 0.5))  # Ensure the plot has some space above the bar
+        ax.set_ylim(0, max(rt60_values) * 1.2)  # Ensure the plot has some space above the bars
 
         # Create a canvas and add the figure to the top-level window
         canvas = FigureCanvasTkAgg(fig, master=popup)
