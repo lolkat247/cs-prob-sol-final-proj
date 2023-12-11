@@ -75,6 +75,10 @@ class MainView:
         self.calc_overall_rt60_button = tk.Button(self.right_frame, text="Calculate Overall RT60", command=self.controller.calculate_and_display_overall_rt60)
         self.calc_overall_rt60_button.pack(side=tk.TOP, pady=10)  # Adjust padding as needed
 
+        # Button to display spectrogram
+        self.show_spectrogram_button = tk.Button(self.right_frame, text="Show Spectrogram", command=self.show_spectrogram)
+        self.show_spectrogram_button.pack(side=tk.TOP, pady=0)
+
     def set_file_label(self, text):
         self.file_label.config(text=text)
 
@@ -132,6 +136,32 @@ class MainView:
         # Run the popup window's event loop
         popup.mainloop()
 
+    def show_spectrogram(self):
+        # Create a new top-level window
+        popup = tk.Toplevel(self.root)
+        popup.title("Spectrogram")
+
+        # Create a figure for the spectrogram
+        fig = Figure(figsize=(6, 4), dpi=100)
+        ax = fig.add_subplot(111)
+
+        # Compute the spectrogram
+        if self.controller.model.data is not None:
+            Pxx, freqs, bins, im = ax.specgram(self.controller.model.data, NFFT=1024, Fs=self.controller.model.sample_rate, noverlap=512)
+
+        ax.set_title('Spectrogram')
+        ax.set_xlabel('Time (s)')
+        ax.set_ylabel('Frequency (Hz)')
+
+        # Create a canvas and add the figure to the top-level window
+        canvas = FigureCanvasTkAgg(fig, master=popup)
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+        # Draw the canvas
+        canvas.draw()
+
+        # Run the popup window's event loop
+        popup.mainloop()
 
     def run(self):
         self.root.mainloop()
