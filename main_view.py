@@ -82,7 +82,10 @@ class MainView:
         self.duration_label.config(text=f"Duration:\n{duration:.2f} seconds")
 
     def set_frequency_label(self, frequency):
-        if frequency: self.frequency_label.config(text=f"Peak Resonant Frequency:\n{frequency:.2f} Hz")
+        if frequency:
+            self.frequency_label.config(text=f"Peak Resonant Frequency:\n{frequency:.2f} Hz")
+        else:
+            self.frequency_label.config(text="Peak Resonant Frequency:\nN/A")
 
     def update_waveform(self, times, data):
         self.waveform_ax.clear()
@@ -104,6 +107,29 @@ class MainView:
         ax.set_ylim(0, max(rt60_value * 1.2, 0.5))  # Ensure the plot has some space above the bar
         ax.set_xticks([])
         canvas.draw()
+
+    def display_overall_rt60_popup(self, overall_rt60):
+        # Create a new top-level window
+        popup = tk.Toplevel(self.root)
+        popup.title("Overall RT60")
+
+        # Create a figure for the RT60 value
+        fig = Figure(figsize=(5, 3), dpi=100)
+        ax = fig.add_subplot(111)
+        ax.bar(['Overall RT60'], [overall_rt60], color='blue')
+        ax.set_ylabel('RT60 (s)')
+        ax.set_ylim(0, max(overall_rt60 * 1.2, 0.5))  # Ensure the plot has some space above the bar
+
+        # Create a canvas and add the figure to the top-level window
+        canvas = FigureCanvasTkAgg(fig, master=popup)
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+        # Draw the canvas
+        canvas.draw()
+
+        # Run the popup window's event loop
+        popup.mainloop()
+
 
     def run(self):
         self.root.mainloop()

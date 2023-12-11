@@ -15,6 +15,10 @@ class AudioController:
             self.view.set_file_label(file_path)
             self.update_view_with_audio_data()
             self.calculate_and_update_rt60()
+            # Calculate the peak resonant frequency
+            peak_frequency = self.model.calculate_peak_resonant_frequency()
+            # Update the frequency label in the view
+            self.view.set_frequency_label(peak_frequency)
 
     def update_view_with_audio_data(self):
         # Update the duration label in the view

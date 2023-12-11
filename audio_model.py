@@ -54,6 +54,7 @@ class AudioModel:
         freqs = np.fft.fftfreq(N, 1 / self.sample_rate)
         peak_freq_index = np.argmax(power_spectrum)
         self.frequency = freqs[peak_freq_index]
+        return self.frequency
 
     def get_waveform_data(self):
         # Return the time and amplitude data for the waveform
