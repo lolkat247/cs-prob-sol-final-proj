@@ -71,6 +71,10 @@ class MainView:
         self.canvas3 = FigureCanvasTkAgg(Figure(figsize=(5, 2), dpi=100), master=self.tab3)
         self.canvas3.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
+        # Button to calculate overall RT60 - This should be the only place where this button is created
+        self.calc_overall_rt60_button = tk.Button(self.right_frame, text="Calculate Overall RT60", command=self.controller.calculate_and_display_overall_rt60)
+        self.calc_overall_rt60_button.pack(side=tk.TOP, pady=10)  # Adjust padding as needed
+
     def set_file_label(self, text):
         self.file_label.config(text=text)
 
@@ -90,49 +94,15 @@ class MainView:
         self.waveform_fig.tight_layout()
         self.waveform_canvas.draw()
 
-    def draw_smiley_face(self):
-        # Clear the current plot
-        self.waveform_ax.clear()
-
-        # Set the title
-        self.waveform_ax.set_title('Smiley Face', fontsize=14, fontweight='bold')
-
-        # Draw a smiley face
-        face = Circle((0.5, 0.5), 0.4, color='yellow', fill=True)
-        left_eye = Circle((0.35, 0.65), 0.05, color='black', fill=True)
-        right_eye = Circle((0.65, 0.65), 0.05, color='black', fill=True)
-        smile = Arc((0.5, 0.4), 0.4, 0.2, angle=0, theta1=210, theta2=330, color='black', linewidth=2)
-
-        self.waveform_ax.add_patch(face)
-        self.waveform_ax.add_patch(left_eye)
-        self.waveform_ax.add_patch(right_eye)
-        self.waveform_ax.add_patch(smile)
-
-        # Hide the axes
-        self.waveform_ax.axis('off')
-
-        # Refresh the canvas
-        self.waveform_canvas.draw()
-
-    def draw_smiley_on_tab(self, canvas, ax):
-        # Clear the current plot
+    def update_rt60_plot(self, canvas, rt60_value, title):
+        fig = canvas.figure
+        ax = fig.add_subplot(111)
         ax.clear()
-
-        # Draw a smiley face
-        face = Circle((0.5, 0.5), 0.4, color='yellow', fill=True)
-        left_eye = Circle((0.35, 0.65), 0.05, color='black', fill=True)
-        right_eye = Circle((0.65, 0.65), 0.05, color='black', fill=True)
-        smile = Arc((0.5, 0.4), 0.4, 0.2, angle=0, theta1=210, theta2=330, color='black', linewidth=2)
-
-        ax.add_patch(face)
-        ax.add_patch(left_eye)
-        ax.add_patch(right_eye)
-        ax.add_patch(smile)
-
-        # Hide the axes
-        ax.axis('off')
-
-        # Refresh the canvas
+        ax.bar([0], [rt60_value], width=0.5)
+        ax.set_title(title)
+        ax.set_ylabel('RT60 (s)')
+        ax.set_ylim(0, max(rt60_value * 1.2, 0.5))  # Ensure the plot has some space above the bar
+        ax.set_xticks([])
         canvas.draw()
 
     def run(self):

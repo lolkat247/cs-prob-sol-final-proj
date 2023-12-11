@@ -8,6 +8,7 @@ import numpy as np
 from scipy.signal import hilbert
 from scipy.io import wavfile
 from scipy.optimize import curve_fit
+from scipy.signal import butter, filtfilt
 
 class AudioModel:
     def __init__(self):
@@ -90,4 +91,25 @@ class AudioModel:
 
         # The RT60 value is the fitted parameter
         rt60_value = popt[0]
+        return rt60_value
+    
+    def band_pass_filter(self, lowcut, highcut):
+        # Design a Butterworth band-pass filter
+        nyquist = 0.5 * self.sample_rate
+        low = lowcut / nyquist
+        high = highcut / nyquist
+        b, a = butter(2, [low, high], btype='band')
+        filtered_data = filtfilt(b, a, self.data)
+        return filtered_data
+
+    def calculate_rt60_for_frequency_range(self, lowcut, highcut):
+        # Filter the data for the given frequency range
+        filtered_data = self.band_pass_filter(lowcut, highcut)
+        # Store the original data
+        original_data = self.data
+        # Calculate the RT60 for the filtered data
+        self.data = filtered_data  # Temporarily overwrite self.data for RT60 calculation
+        rt60_value = self.calculate_rt60()
+        # Restore the original data
+        self.data = original_data
         return rt60_value
